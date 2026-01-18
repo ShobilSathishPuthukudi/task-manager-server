@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment Variables (IMPORTANT: Never upload your secrets!)
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Build/Dist (if you use TypeScript later)
+dist/
+build/
