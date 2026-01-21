@@ -5,9 +5,10 @@ const authLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
+  statusCode: 429,
   message: {
     success: false,
-    message: 'Too many attempts, try agin later',
+    message: 'Too many attempts, try again later',
   },
 });
 
