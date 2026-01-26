@@ -25,7 +25,7 @@ const userSchema = mongoose.Schema({
     required: [true, 'Please add a password'],
     trim: true,
     minlength: [6, 'Password must be at least 6 characters'],
-    maxlength: [128], 'Password cannot be more than 50 characters'],
+    maxlength: [128, 'Password cannot be more than 128 characters'],
     select: false,
   },
   refreshToken: {
@@ -39,14 +39,9 @@ const userSchema = mongoose.Schema({
 });
 
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return;
 
-  try {
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {

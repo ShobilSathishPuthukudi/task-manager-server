@@ -6,7 +6,7 @@ import gracefulShutdown from './src/utils/gracefulShutdown.js';
 
 dotenv.config();
 
-const PORT_DEFAULT = 3000;
+const PORT_DEFAULT = 4000;
 const PORT = process.env.PORT || PORT_DEFAULT;
 
 if (PORT === PORT_DEFAULT) {

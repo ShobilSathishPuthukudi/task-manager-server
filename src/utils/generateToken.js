@@ -21,7 +21,6 @@ const verifyRefreshToken = (token) => {
 };
 
 export {
-  generateToken,
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
