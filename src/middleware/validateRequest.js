@@ -4,10 +4,16 @@ const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      message: errors.array()[0].msg,
-    });
+    const formattedErrors = errors.array().map((err) => ({
+      field: err.path,
+      message: err.msg,
+    }));
+
+    const error = new Error('Validation error');
+    error.statusCode = 400;
+    error.errors = formattedErrors;
+
+    return next(error);
   }
 
   next();

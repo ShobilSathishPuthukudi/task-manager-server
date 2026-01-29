@@ -3,7 +3,7 @@ import { body } from 'express-validator';
 const registerValidation = [
   body('name')
     .trim()
-    .notEmpty()
+    .exists({ checkFalsy: true })
     .withMessage('Name is required')
     .isLength({ min: 3 })
     .withMessage('Name must be at least 3 characters')
@@ -12,7 +12,7 @@ const registerValidation = [
 
   body('email')
     .trim()
-    .notEmpty()
+    .exists({ checkFalsy: true })
     .withMessage('Email is required')
     .isEmail()
     .withMessage('Valid email is required')
@@ -20,7 +20,7 @@ const registerValidation = [
 
   body('password')
     .trim()
-    .notEmpty()
+    .exists({ checkFalsy: true })
     .withMessage('Password is required')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters')
@@ -31,7 +31,7 @@ const registerValidation = [
 const loginValidation = [
   body('email')
     .trim()
-    .notEmpty()
+    .exists({ checkFalsy: true })
     .withMessage('Email is required')
     .isEmail()
     .withMessage('Valid email is required')

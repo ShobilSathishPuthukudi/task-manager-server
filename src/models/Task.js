@@ -44,19 +44,24 @@ const taskSchema = new mongoose.Schema(
       index: true,
     },
 
+    dueDate: {
+      type: Date,
+    },
+
     tags: {
       type: [String],
       default: [],
-    },
-
-    dueDate: {
-      type: Date,
     },
 
     category: {
       type: String,
       trim: true,
       index: true,
+    },
+
+    hasAttachments: {
+      type: Boolean,
+      default: false,
     },
 
     attachments: [
@@ -67,6 +72,30 @@ const taskSchema = new mongoose.Schema(
         uploadedAt: {
           type: Date,
           default: Date.now,
+        },
+      },
+    ],
+
+    hasSubtasks: {
+      type: Boolean,
+      default: false,
+    },
+
+    subtasks: [
+      {
+        title: {
+          type: String,
+          trim: true,
+          minLength: [3, 'Title must be at least 3 characters'],
+          maxLength: [100, 'Title cannot be more than 100 characters'],
+          required: true,
+        },
+        isCompleted: {
+          type: Boolean,
+          default: false,
+        },
+        completedAt: {
+          type: Date,
         },
       },
     ],
@@ -98,25 +127,6 @@ const taskSchema = new mongoose.Schema(
         type: Date,
       },
     },
-
-    subtasks: [
-      {
-        title: {
-          type: String,
-          trim: true,
-          minLength: [3, 'Title must be at least 3 characters'],
-          maxLength: [100, 'Title cannot be more than 100 characters'],
-          required: true,
-        },
-        isCompleted: {
-          type: Boolean,
-          default: false,
-        },
-        completedAt: {
-          type: Date,
-        },
-      },
-    ],
 
     completedAt: {
       type: Date,
