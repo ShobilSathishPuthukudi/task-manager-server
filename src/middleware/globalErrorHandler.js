@@ -8,7 +8,7 @@ const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message: err.message || 'Server error',
-    errors: err.erros || undefined,
+    errors: err.errors || undefined,
   });
 };
 

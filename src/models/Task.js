@@ -56,6 +56,7 @@ const taskSchema = new mongoose.Schema(
     category: {
       type: String,
       trim: true,
+      default: 'general',
       index: true,
     },
 
@@ -150,15 +151,14 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-taskSchema.pre(/^find/, function (next) {
+taskSchema.pre(/^find/, async function () {
   if (this.getFilter().isDeleted !== true) {
     this.where({ isDeleted: { $ne: true } });
   }
-  next();
 });
 
-taskSchema.pre('save', function (next) {
-  if (!this.isModified('status')) return next();
+taskSchema.pre('save', async function () {
+  if (!this.isModified('status')) return;
 
   if (this.status === 'completed') {
     this.completedAt = Date.now();
@@ -172,8 +172,6 @@ taskSchema.pre('save', function (next) {
   } else {
     this.completedAt = undefined;
   }
-
-  next();
 });
 
 taskSchema.index({ user: 1, isDeleted: 1, status: 1, createdAt: -1 });

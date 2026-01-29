@@ -36,12 +36,7 @@ const subtaskFieldCondition = (value, { req }) => {
 };
 
 const createTaskValidator = [
-  body('user')
-    .exists({ checkFalsy: true })
-    .withMessage('User is required')
-    .bail()
-    .isMongoId()
-    .withMessage('Invalid userId format'),
+  body('user').optional().isMongoId().withMessage('Invalid userId format'),
 
   body('title')
     .trim()
@@ -59,15 +54,10 @@ const createTaskValidator = [
 
   body('status')
     .optional()
-    .trim()
-    .exists({ checkFalsy: true })
-    .withMessage('Status can not be empty')
-    .bail()
     .isIn(['pending', 'in-progress', 'completed'])
     .withMessage('Invalid status value, use pending, in-progress, completed'),
 
   body('priority')
-    .optional()
     .trim()
     .exists({ checkFalsy: true })
     .withMessage('Priority can not be empty')
@@ -76,7 +66,6 @@ const createTaskValidator = [
     .withMessage('Invalid priority value, use low, medium, high'),
 
   body('dueDate')
-    .optional()
     .trim()
     .exists({ checkFalsy: true })
     .withMessage('Due date can not be empty')
@@ -116,12 +105,8 @@ const createTaskValidator = [
 
   body('category')
     .optional()
-    .trim()
-    .exists({ checkFalsy: true })
-    .withMessage('Category can not be empty')
-    .bail()
-    .isLength({ max: 50 })
-    .withMessage('Category cannot be more than 50 characters'),
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Category must be between 1-20 characters'),
 
   //================== ATTACHMENTS ===============//
 
@@ -333,13 +318,13 @@ const taskIdValidator = [
 
 const updateTaskValidator = [
   body('title')
-    .optional({ values: 'falsy' })
+    .optional()
     .trim()
     .isLength({ min: 3, max: 100 })
     .withMessage('Title must be between 3-100 characters'),
 
   body('description')
-    .optional({ values: 'falsy' })
+    .optional()
     .trim()
     .isLength({ min: 3, max: 5000 })
     .withMessage('Description must be between 3-5000 characters'),
@@ -357,7 +342,7 @@ const updateTaskValidator = [
     .withMessage('Invalid priority value, use low, medium, high'),
 
   body('dueDate')
-    .optional({ values: 'falsy' })
+    .optional()
     .bail()
     .isISO8601()
     .withMessage('Due date must be a valid date')
@@ -380,7 +365,7 @@ const updateTaskValidator = [
     .withMessage('Tags must be an array (max 10 items)'),
 
   body('tags.*')
-    .optional({ values: 'falsy' })
+    .optional()
     .isString()
     .withMessage('Tag must be a string')
     .isLength({ min: 1, max: 50 })
@@ -389,7 +374,7 @@ const updateTaskValidator = [
   //================== CATEGORY ===============//
 
   body('category')
-    .optional({ values: 'falsy' })
+    .optional()
     .bail()
     .isLength({ max: 50 })
     .withMessage('Category cannot be more than 50 characters'),
@@ -629,3 +614,10 @@ const getTasksQueryValidator = [
 
   query('search').optional().trim().escape(),
 ];
+
+export {
+  createTaskValidator,
+  updateTaskValidator,
+  getTasksQueryValidator,
+  taskIdValidator,
+};
