@@ -77,4 +77,107 @@ const deleteTask = asyncHandler(async (req, res) => {
   });
 });
 
-export { createTask, getTaskByUser, updateTask, deleteTask };
+const getTrashTasks = asyncHandler(async (req, res) => {
+  const tasks = await Task.find({
+    user: req.user._id,
+    isDeleted: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'success',
+    count: tasks.length,
+    data: tasks,
+  });
+});
+
+const restoreTask = asyncHandler(async (req, res) => {
+  const trashedTask = await Task.findOne({
+    _id: req.params.id,
+    user: req.user._id,
+    isDeleted: true,
+  });
+
+  if (!trashedTask) {
+    res.status(404);
+    throw new Error('Task not found in trash');
+  }
+
+  console.log(trashedTask.title);
+
+  const duplicateActiveTask = await Task.findOne({
+    user: req.user._id,
+    title: trashedTask.title,
+    isDeleted: false,
+  });
+
+  if (duplicateActiveTask) {
+    res.status(400);
+    throw new Error(
+      'Cannot restore. An active task with the same title already exists. Change the title of active task to restore.'
+    );
+  }
+
+  console.log(duplicateActiveTask);
+
+  trashedTask.isDeleted = false;
+  trashedTask.deletedAt = undefined;
+
+  await trashedTask.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Task restored successfully',
+    data: trashedTask,
+  });
+});
+
+const hardDeleteTask = asyncHandler(async (req, rs) => {
+  const task = await Task.findOne({
+    _id: req.params.id,
+    user: req.user._id,
+    isDeleted: true,
+  });
+
+  if (!task) {
+    res.status(404);
+    throw new Error('Task not found in the trash');
+  }
+
+  await task.hardDelete();
+
+  res.status(200).json({
+    success: true,
+    message: 'Task deleted permanently',
+  });
+});
+
+const hardDeleteAll = asyncHandler(async (req, res) => {
+  const result = await Task.deleteMany({
+    user: req.user._id,
+    isDeleted: true,
+  });
+
+  if (result.deletedCount === 0) {
+    res.status(200).json({
+      success: true,
+      message: 'Trash is already empty, nothing to delete',
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `Successfully cleared ${result.deletedCount} ${result.deletedCount === 1 ? 'task' : 'tasks'} from trash`,
+  });
+});
+
+export {
+  createTask,
+  getTaskByUser,
+  updateTask,
+  deleteTask,
+  getTrashTasks,
+  restoreTask,
+  hardDeleteTask,
+  hardDeleteAll,
+};

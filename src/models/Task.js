@@ -211,6 +211,12 @@ taskSchema.methods.softDelete = async function () {
   return await this.save();
 };
 
+taskSchema.methods.hardDelete = async function () {
+  this.isDeleted = true;
+  this.deletedAt = Date.now();
+  return await this.deleteOne();
+};
+
 taskSchema.statics.getTaskByUser = function (userId, options = {}) {
   const query = this.find({ user: userId });
 

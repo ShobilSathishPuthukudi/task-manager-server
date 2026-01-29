@@ -1,6 +1,7 @@
 import express from 'express';
 import protect from '../middleware/authMiddleware.js';
 import validateRequest from '../middleware/validateRequest.js';
+import { trashLimiter } from '../middleware/rateLimiter.js';
 import {
   getTasksQueryValidator,
   createTaskValidator,
@@ -12,6 +13,10 @@ import {
   createTask,
   updateTask,
   deleteTask,
+  getTrashTasks,
+  restoreTask,
+  hardDeleteTask,
+  hardDeleteAll,
 } from '../controllers/taskController.js';
 
 const router = express.Router();
@@ -31,5 +36,19 @@ router.patch(
 );
 
 router.delete('/:id', taskIdValidator, validateRequest, deleteTask);
+
+router.get('/trash', getTasksQueryValidator, validateRequest, getTrashTasks);
+
+router.patch('/:id/restore', taskIdValidator, validateRequest, restoreTask);
+
+router.delete(
+  '/:id/permanent',
+  trashLimiter,
+  taskIdValidator,
+  validateRequest,
+  hardDeleteTask
+);
+
+router.delete('/trash/empty', trashLimiter, hardDeleteAll);
 
 export default router;

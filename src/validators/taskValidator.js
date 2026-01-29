@@ -595,12 +595,12 @@ const getTasksQueryValidator = [
   query('status')
     .optional()
     .isIn(['pending', 'in-progress', 'completed'])
-    .withMessage('Invalid status filter'),
+    .withMessage('Invalid status filter, use pending, in-progress, completed'),
 
   query('priority')
     .optional()
     .isIn(['low', 'medium', 'high'])
-    .withMessage('Invalid priority filter'),
+    .withMessage('Invalid priority filter, use low, medium, high'),
 
   query('page')
     .optional()

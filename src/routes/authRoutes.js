@@ -5,7 +5,7 @@ import {
 } from '../validators/authValidator.js';
 
 import validateRequest from '../middleware/ValidateRequest.js';
-import authLimiter from '../middleware/rateLimiter.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 
 import {
   getCurrentUser,
