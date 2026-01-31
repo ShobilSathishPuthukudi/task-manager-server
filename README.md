@@ -1,137 +1,99 @@
-# 📝 Task Manager API
+# Task Manager API (MERN Backend)
 
-A secure and scalable RESTful API built with **Node.js**, **Express**, and **MongoDB**. This backend serves as the core for a task management system, implementing industry-standard security practices for authentication and session management.
-
----
-
-## ✨ Features
-
-- **JWT Authentication**: Secure access using short-lived Access Tokens.
-- **Refresh Token Rotation**: Enhanced security by rotating refresh tokens on every use and storing hashed versions in MongoDB.
-- **Secure Cookies**: Refresh tokens are served via `HttpOnly` and `SameSite` cookies to prevent XSS attacks.
-- **Centralized Error Handling**: Custom error middleware to provide consistent JSON error responses.
-- **Data Validation**: Strict request body validation before processing logic.
+A secure and scalable Task Manager REST API built using Node.js, Express, and MongoDB.  
+This backend implements JWT authentication with Access Token and Refresh Token flow.
 
 ---
 
-## 🛠 Tech Stack
+## 🚀 Features
 
-- **Runtime**: [Node.js](https://nodejs.org/)
-- **Framework**: [Express.js](https://expressjs.com/)
-- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
-- **Security**: [JSON Web Tokens (JWT)](https://jwt.io/), [Bcrypt.js](https://github.com/kelektiv/node.bcrypt.js)
-- **Middleware**: [Express-Async-Handler](https://www.npmjs.com/package/express-async-handler)
-
----
-
-## 📂 Project Structure
-
-```text
-src/
-├── config/         # Database and server configurations
-├── controllers/    # Business logic for routes
-├── middleware/     # Auth guards and error handlers
-├── models/         # Mongoose schemas (User, Task)
-├── routes/         # Express route definitions
-├── utils/          # Token generation and verification logic
-└── app.js          # Main application entry point
-```
-
-Here is a complete, copy-paste-ready README.md block for your backend. I’ve refined the structure to be professional and added placeholders for your specific details.
-
-Markdown
-
-# 📝 Task Manager API
-
-A secure and scalable RESTful API built with **Node.js**, **Express**, and **MongoDB**. This backend serves as the core for a task management system, implementing industry-standard security practices for authentication and session management.
-
----
-
-## ✨ Features
-
-- **JWT Authentication**: Secure access using short-lived Access Tokens.
-- **Refresh Token Rotation**: Enhanced security by rotating refresh tokens on every use and storing hashed versions in MongoDB.
-- **Secure Cookies**: Refresh tokens are served via `HttpOnly` and `SameSite` cookies to prevent XSS attacks.
-- **Centralized Error Handling**: Custom error middleware to provide consistent JSON error responses.
-- **Data Validation**: Strict request body validation before processing logic.
+- User Authentication (Register / Login)
+- JWT Access Token & Refresh Token Architecture
+- Secure Refresh Token using HTTP-only Cookies
+- Protected Routes with Middleware
+- Task CRUD Operations
+- Input Validation & Error Handling
+- Token Auto Refresh Support
+- Environment-based Configuration
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Runtime**: [Node.js](https://nodejs.org/)
-- **Framework**: [Express.js](https://expressjs.com/)
-- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
-- **Security**: [JSON Web Tokens (JWT)](https://jwt.io/), [Bcrypt.js](https://github.com/kelektiv/node.bcrypt.js)
-- **Middleware**: [Express-Async-Handler](https://www.npmjs.com/package/express-async-handler)
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- JWT Authentication
+- Cookie Parser
+- dotenv
+- CORS Middleware
 
 ---
 
-📡 API Endpoints
-Authentication
-Method Endpoint Description Auth Required
-POST /api/auth/register Register a new user No
-POST /api/auth/login Login & receive tokens No
-POST /api/auth/refresh Rotate refresh token Yes (Cookie)
-GET /api/auth/me Get current user profile Yes (Bearer)
+## 🔐 Authentication Flow
 
-Here is a complete, copy-paste-ready README.md block for your backend. I’ve refined the structure to be professional and added placeholders for your specific details.
-
-Markdown
-
-# 📝 Task Manager API
-
-A secure and scalable RESTful API built with **Node.js**, **Express**, and **MongoDB**. This backend serves as the core for a task management system, implementing industry-standard security practices for authentication and session management.
+- Access Token (Short-lived)
+- Refresh Token (Long-lived, stored in HttpOnly Cookie)
+- Automatic Access Token Renewal using `/auth/refresh`
+- Current User Fetch via `/auth/me`
 
 ---
 
-## ✨ Features
+## 📌 API Endpoints
 
-- **JWT Authentication**: Secure access using short-lived Access Tokens.
-- **Refresh Token Rotation**: Enhanced security by rotating refresh tokens on every use and storing hashed versions in MongoDB.
-- **Secure Cookies**: Refresh tokens are served via `HttpOnly` and `SameSite` cookies to prevent XSS attacks.
-- **Centralized Error Handling**: Custom error middleware to provide consistent JSON error responses.
-- **Data Validation**: Strict request body validation before processing logic.
+All endpoints below require a valid **Bearer Token** in the `Authorization` header.
+
+### 📝 Active Tasks
+
+| Method     | Endpoint         | Description                         | Middleware/Validation                   |
+| :--------- | :--------------- | :---------------------------------- | :-------------------------------------- |
+| **GET**    | `/api/tasks`     | Fetch user tasks (supports filters) | `getTasksQueryValidator`                |
+| **POST**   | `/api/tasks`     | Create a new task                   | `createTaskValidator`                   |
+| **PATCH**  | `/api/tasks/:id` | Update specific task fields         | `taskIdValidator`,`updateTaskValidator` |
+| **DELETE** | `/api/tasks/:id` | Move task to trash (Soft Delete)    | `taskIdValidator`                       |
+
+### 🗑️ Trash & Recovery
+
+| Method     | Endpoint                   | Description                      | Middleware/Validation            |
+| :--------- | :------------------------- | :------------------------------- | :------------------------------- |
+| **GET**    | `/api/tasks/trash`         | View all soft-deleted tasks      | `getTasksQueryValidator`         |
+| **PATCH**  | `/api/tasks/:id/restore`   | Restore a task from trash        | `taskIdValidator`                |
+| **DELETE** | `/api/tasks/:id/permanent` | Permanent deletion (Destructive) | `trashLimiter`,`taskIdValidator` |
+| **DELETE** | `/api/tasks/trash/empty`   | Wipe all tasks in trash          | `trashLimiter`                   |
+
+## ⚙️ Environment Variables
+
+To run this project, you will need to add the following variables to your .env file (locally) or your Render Dashboard (production):
+Create a `.env` file with these keys:
+
+- MONGO_URI
+- JWT_ACCESS_SECRET
+- JWT_REFRESH_SECRET
+- NODE_ENV
+- CLIENT_URL
+- ACCESS_TOKEN_EXPIRE
+- REFRESH_TOKEN_EXPIRE
+
+## 🔒 Security Highlights
+
+- Environment variable based secrets
+- HTTP-only refresh token cookies
+- Token expiration handling
+- Rate limiting on destructive operations
+- Middleware-based route protection
 
 ---
 
-## 🛠 Tech Stack
+## 👨‍💻 Author
 
-- **Runtime**: [Node.js](https://nodejs.org/)
-- **Framework**: [Express.js](https://expressjs.com/)
-- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
-- **Security**: [JSON Web Tokens (JWT)](https://jwt.io/), [Bcrypt.js](https://github.com/kelektiv/node.bcrypt.js)
-- **Middleware**: [Express-Async-Handler](https://www.npmjs.com/package/express-async-handler)
+**Shobil Sathish**  
+MERN Stack Developer  
+GitHub: https://github.com/ShobilSathishPuthukudi
 
 ---
 
-## 📂 Project Structure
+## 📌 Project Status
 
-src/
-├── config/ # Database and server configurations
-├── controllers/ # Business logic for routes
-├── middleware/ # Auth guards and error handlers
-├── models/ # Mongoose schemas (User, Task)
-├── routes/ # Express route definitions
-├── utils/ # Token generation and verification logic
-└── app.js # Main application entry point
-
-## 📡 API Endpoints
-
-## 📡 Task Management API
-
-📝 Active Tasks
-
-Method Endpoint Description
-GET / Fetch all user tasks
-POST / Create a new task
-PATCH /:id Update specific task fields
-DELETE /:id Move task to Trash (Soft delete)
-
-🗑️ Trash & Recovery
-
-Method Endpoint Description
-GET /trash View soft-deleted tasks
-PATCH /:id/restore Restore task to active list
-DELETE /:id/permanent Hard delete single task (Rate limited)
-DELETE /trash/empty Wipe all trash (Rate limited)
+Backend Completed  
+Frontend Integration In Progress
