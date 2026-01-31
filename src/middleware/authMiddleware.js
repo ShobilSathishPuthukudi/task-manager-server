@@ -17,23 +17,28 @@ const protect = asyncHandler(async (req, res, next) => {
     throw new Error('Not authorized, token missing');
   }
 
-  const decoded = verifyAccessToken(token);
+  try {
+    const decoded = verifyAccessToken(token);
 
-  if (!decoded?.userId) {
+    if (!decoded?.userId) {
+      res.status(401);
+      throw new Error('Invalid or expired token');
+    }
+
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      res.status(401);
+      throw new Error('Not authorized');
+    }
+
+    req.user = user;
+
+    next();
+  } catch (error) {
     res.status(401);
-    throw new Error('Invalid or expired token');
+    throw new Error(error.message || 'Invalid or expired token');
   }
-
-  const user = await User.findById(decoded.userId);
-
-  if (!user) {
-    res.status(401);
-    throw new Error('Not authorized');
-  }
-
-  req.user = user;
-
-  next();
 });
 
 export default protect;

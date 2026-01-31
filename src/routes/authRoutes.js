@@ -4,7 +4,7 @@ import {
   registerValidation,
 } from '../validators/authValidator.js';
 
-import validateRequest from '../middleware/ValidateRequest.js';
+import validateRequest from '../middleware/validateRequest.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 
 import {

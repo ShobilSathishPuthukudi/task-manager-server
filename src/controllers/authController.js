@@ -100,47 +100,52 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     throw new Error('Unauthorized');
   }
 
-  const decode = verifyRefreshToken(refreshToken);
+  try {
+    const decode = verifyRefreshToken(refreshToken);
 
-  if (!decode?.userId) {
-    res.clearCookie('refreshToken', cookieOptions);
-    res.status(403);
-    throw new Error('Unauthorized');
+    if (!decode?.userId) {
+      res.clearCookie('refreshToken', cookieOptions);
+      res.status(403);
+      throw new Error('Unauthorized');
+    }
+
+    const user = await User.findById(decode.userId).select('+refreshToken');
+
+    if (!user || !user.refreshToken) {
+      res.clearCookie('refreshToken', cookieOptions);
+      res.status(403);
+      throw new Error('Unauthorized');
+    }
+
+    const isValidToken = await bcrypt.compare(refreshToken, user.refreshToken);
+
+    if (!isValidToken) {
+      res.clearCookie('refreshToken', cookieOptions);
+      res.status(403);
+      throw new Error('Unauthorized');
+    }
+
+    const newAccessToken = generateAccessToken(user._id);
+    const newRefreshToken = generateRefreshToken(user._id);
+
+    const hashedNewRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+
+    user.refreshToken = hashedNewRefreshToken;
+    await user.save();
+
+    res.cookie('refreshToken', newRefreshToken, cookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: 'Success',
+      data: {
+        newAccessToken,
+      },
+    });
+  } catch (error) {
+    res.status(401);
+    throw new Error(error.message || 'Unauthorized');
   }
-
-  const user = await User.findById(decode.userId).select('+refreshToken');
-
-  if (!user || !user.refreshToken) {
-    res.clearCookie('refreshToken', cookieOptions);
-    res.status(403);
-    throw new Error('Unauthorized');
-  }
-
-  const isValidToken = await bcrypt.compare(refreshToken, user.refreshToken);
-
-  if (!isValidToken) {
-    res.clearCookie('refreshToken', cookieOptions);
-    res.status(403);
-    throw new Error('Unauthorized');
-  }
-
-  const newAccessToken = generateAccessToken(user._id);
-  const newRefreshToken = generateRefreshToken(user._id);
-
-  const hashedNewRefreshToken = await bcrypt.hash(newRefreshToken, 10);
-
-  user.refreshToken = hashedNewRefreshToken;
-  await user.save();
-
-  res.cookie('refreshToken', newRefreshToken, cookieOptions);
-
-  res.status(200).json({
-    success: true,
-    message: 'Success',
-    data: {
-      newAccessToken,
-    },
-  });
 });
 
 const getCurrentUser = (req, res) => {
